@@ -1,7 +1,9 @@
 package ru.netology.web.test;
+
 import org.junit.jupiter.api.Test;
 import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.LoginPage;
+
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,6 +57,22 @@ class MoneyTransferTest {
 
         assertEquals(balanceEndTransferFirstCard, balanceOfFirstCardEnd);
         assertEquals(balanceEndTransferSecondCard, balanceOfSecondCardEnd);
+
+    }
+
+    @Test
+    void shouldTransferMoneyAboveBalance() {
+        int amount = 13000;
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+        var transferMoneyToOtherCardPage = dashboardPage.cashInSecond();
+        var cardInfo = DataHelper.getFirstCardInfo();
+
+        transferMoneyToOtherCardPage.transferCard(cardInfo, amount);
+        transferMoneyToOtherCardPage.getNotificationAboutLimit();
 
     }
 
